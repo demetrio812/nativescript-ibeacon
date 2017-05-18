@@ -1,0 +1,11 @@
+android {
+	productFlavors {
+		"nativescript-ibeacon" {
+			dimension "nativescript-ibeacon"
+		}
+	}
+}
+
+dependencies {
+	compile 'org.altbeacon:android-beacon-library:2.9.2'
+}

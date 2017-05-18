@@ -1,6 +1,6 @@
 {
   "nativescript": {
-    "id": "org.nativescript.demo",
+    "id": "io.novaware.ibeacons.demo",
     "tns-ios": {
       "version": "2.5.0"
     },
