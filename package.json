@@ -1,6 +1,6 @@
 {
   "name": "nativescript-ibeacon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "iBeacon scanning support for Nativescript",
   "main": "nativescript-ibeacon",
   "typings": "index.d.ts",

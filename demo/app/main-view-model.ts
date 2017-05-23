@@ -1,7 +1,6 @@
 import {Observable} from 'data/observable';
 import {NativescriptIbeacon} from 'nativescript-ibeacon';
-import {BeaconRegion} from "nativescript-ibeacon/nativescript-ibeacon.common";
-import {Beacon, BeaconCallback} from "../../nativescript-ibeacon.common";
+import {BeaconRegion, Beacon, BeaconCallback} from "nativescript-ibeacon/nativescript-ibeacon.common";
 
 export class HelloWorldModel extends Observable implements BeaconCallback {
     private nativescriptIbeacon: NativescriptIbeacon;
@@ -15,7 +14,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
         this.nativescriptIbeacon = new NativescriptIbeacon(this);
 
-        this.region = new BeaconRegion("HelloID", "2f234454-cf6d-4a0f-adf2-f4911ba9ffa7");
+        this.region = new BeaconRegion("HelloID", "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6");
     }
 
     start() {
@@ -28,7 +27,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         this.nativescriptIbeacon.stopRanging(this.region);
     }
 
-    didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]) {
+    didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]): void {
         console.log("didRangeBeaconsInRegion: " + region.identifier + " - " + beacons.length);
         //this.message = "didRangeBeaconsInRegion: " + (new Date().toDateString());
         for (let beacon of beacons) {
@@ -36,7 +35,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         }
     }
 
-    didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string) {
+    didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string): void {
         console.log("didFailRangingBeaconsInRegion: " + region.identifier + " - " + errorCode + " - " + errorDescription);
     }
 

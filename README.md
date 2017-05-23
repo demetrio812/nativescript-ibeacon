@@ -16,3 +16,4 @@ let nativescriptIbeacon: NativescriptIbeacon = new NativescriptIbeacon();
 * Better Demo
 * Region monitoring
 * Debug
+* More options
