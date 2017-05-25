@@ -7,10 +7,40 @@ export interface BeaconCallback {
     didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string): void;
 }
 
+export enum BeaconLocationOptionsIOSAuthType {
+    Always, WhenInUse
+}
+export enum BeaconLocationOptionsAndroidAuthType {
+    Coarse, Fine
+}
+
+export interface BeaconLocationOptions {
+    iOSAuthorisationType: BeaconLocationOptionsIOSAuthType;
+    androidAuthorisationType: BeaconLocationOptionsAndroidAuthType;
+    androidAuthorisationDescription: string;
+}
+
 export class Common extends Observable {
 
-    constructor(beaconCallback: BeaconCallback) {
+    protected options: BeaconLocationOptions = {
+        iOSAuthorisationType: BeaconLocationOptionsIOSAuthType.WhenInUse,
+        androidAuthorisationType: BeaconLocationOptionsAndroidAuthType.Coarse,
+        androidAuthorisationDescription: "Location permission needed"
+    };
+
+    constructor(beaconCallback: BeaconCallback, options?: BeaconLocationOptions) {
         super();
+        if (options) {
+            this.options = options;
+        }
+    }
+
+    public requestAuthorization(): Promise<any> {
+        return null;
+    }
+
+    public isAuthorised() : boolean {
+        return false;
     }
 
     public startRanging(beaconRegion: BeaconRegion) {
@@ -54,9 +84,11 @@ export class Beacon {
     public setDistance(distance: number) {
         this.distance = distance;
     }
+
     public setRssi(rssi: number) {
         this.rssi = rssi;
     }
+
     public setTxPower(txPower: number) {
         this.txPower = txPower;
     }

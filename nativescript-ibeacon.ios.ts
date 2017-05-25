@@ -1,4 +1,7 @@
-import {Beacon, BeaconCallback, BeaconRegion, Common} from './nativescript-ibeacon.common';
+import {
+    Beacon, BeaconCallback, BeaconLocationOptions, BeaconLocationOptionsIOSAuthType, BeaconRegion,
+    Common
+} from './nativescript-ibeacon.common';
 
 export class LocationService extends NSObject implements CLLocationManagerDelegate {
 
@@ -8,9 +11,37 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
 
     private locationManager: CLLocationManager = null;
 
+    private authorisationPromise: any = null;
+
     constructor() {
         super();
         console.log("constructor");
+    }
+
+    public requestAuthorization(type: BeaconLocationOptionsIOSAuthType): Promise<any> {
+        console.log("requestAuthorization: start");
+        let me = this;
+        return new Promise(function (granted, failed) {
+            console.log("requestAuthorization: in promise");
+            if (type == BeaconLocationOptionsIOSAuthType.WhenInUse) {
+                console.log("requestAuthorization: when in use");
+                me.getLocationManager().requestWhenInUseAuthorization();
+            } else {
+                console.log("requestAuthorization: always");
+                me.getLocationManager().requestAlwaysAuthorization();
+            }
+
+            me.authorisationPromise = {granted: granted, failed: failed};
+        });
+    }
+
+    public isAuthorised(): boolean {
+        let authstate = CLLocationManager.authorizationStatus();
+        console.log("Auth state = " + authstate);
+        return !(authstate == CLAuthorizationStatus.kCLAuthorizationStatusNotDetermined
+            || authstate == CLAuthorizationStatus.kCLAuthorizationStatusRestricted
+            || authstate == CLAuthorizationStatus.kCLAuthorizationStatusDenied
+        );
     }
 
     private getLocationManager(): CLLocationManager {
@@ -24,7 +55,6 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
             // iosLocManager.distanceFilter = options ? options.updateDistance : nativescript_geolocation_common_1.minRangeUpdate;
             // locationManagers[locListener.id] = iosLocManager;
             // locationListeners[locListener.id] = locListener;
-            this.locationManager.requestAlwaysAuthorization(); // TODO type of authorisation as an option
         }
         console.log("getLocationManager3: " + this.locationManager);
         return this.locationManager;
@@ -88,16 +118,50 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
             this.delegate.didFailRangingBeaconsInRegion(this.getBeaconRegion(region), error.code, error.description);
         }
     }
+
+    locationManagerDidChangeAuthorizationStatus?(manager: CLLocationManager, status: CLAuthorizationStatus): void {
+        console.log("requestAuthorization: init: " + status);
+        if (this.authorisationPromise != null && status != CLAuthorizationStatus.kCLAuthorizationStatusNotDetermined) {
+            // TODO this code runs immediately and gives error: Use the delegate method locationManager:didChangeAuthorizationStatus: to run your code when the user allows or disallows the location request.
+            console.log("requestAuthorization: check");
+            // If the user accepted
+            if (status == CLAuthorizationStatus.kCLAuthorizationStatusRestricted
+                || status == CLAuthorizationStatus.kCLAuthorizationStatusDenied) {
+                console.log("requestAuthorization: failed");
+                this.authorisationPromise.failed();
+            } else {
+                console.log("requestAuthorization: granted");
+                this.authorisationPromise.granted();
+            }
+            console.log("requestAuthorization: reset");
+            this.authorisationPromise = null;
+        }
+    }
 }
 
 export class NativescriptIbeacon extends Common {
 
     private locationService: LocationService = null;
 
-    constructor(beaconCallback: BeaconCallback) {
-        super(beaconCallback);
+    constructor(beaconCallback: BeaconCallback, options?: BeaconLocationOptions) {
+        super(beaconCallback, options);
         this.locationService = new LocationService();
         this.locationService.delegate = beaconCallback;
+    }
+
+    public requestAuthorization(): Promise<any> {
+        console.log("requestAuthorization: " + this.options);
+        if (this.options) {
+            console.log("requestAuthorization from options: " + this.options.iOSAuthorisationType.toString());
+            return this.locationService.requestAuthorization(this.options.iOSAuthorisationType);
+        } else {
+            console.log("requestAuthorization default (WhenInUse)");
+            return this.locationService.requestAuthorization(BeaconLocationOptionsIOSAuthType.WhenInUse);
+        }
+    }
+
+    public isAuthorised(): boolean {
+        return this.locationService.isAuthorised();
     }
 
     public startRanging(beaconRegion: BeaconRegion) {

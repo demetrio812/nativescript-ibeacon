@@ -1,6 +1,9 @@
 import {Observable} from 'data/observable';
 import {NativescriptIbeacon} from 'nativescript-ibeacon';
-import {BeaconRegion, Beacon, BeaconCallback} from "nativescript-ibeacon/nativescript-ibeacon.common";
+import {
+    BeaconRegion, Beacon, BeaconCallback,
+    BeaconLocationOptions, BeaconLocationOptionsIOSAuthType, BeaconLocationOptionsAndroidAuthType
+} from "nativescript-ibeacon/nativescript-ibeacon.common";
 
 export class HelloWorldModel extends Observable implements BeaconCallback {
     private nativescriptIbeacon: NativescriptIbeacon;
@@ -12,14 +15,32 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
     constructor() {
         super();
 
-        this.nativescriptIbeacon = new NativescriptIbeacon(this);
+        let options: BeaconLocationOptions = {
+            iOSAuthorisationType: BeaconLocationOptionsIOSAuthType.Always,
+            androidAuthorisationType: BeaconLocationOptionsAndroidAuthType.Coarse,
+            androidAuthorisationDescription: "Location permission needed"
+        };
+        this.nativescriptIbeacon = new NativescriptIbeacon(this, options);
 
         this.region = new BeaconRegion("HelloID", "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6");
     }
 
     start() {
         this.message = "start";
-        this.nativescriptIbeacon.startRanging(this.region);
+        if (!this.nativescriptIbeacon.isAuthorised()) {
+            console.log("NOT Authorised");
+            this.nativescriptIbeacon.requestAuthorization()
+                .then(() => {
+                    console.log("Authorised by the user");
+                    this.nativescriptIbeacon.startRanging(this.region);
+
+                }, (e) => {
+                    console.log("Authorisation denied by the user");
+                })
+        } else {
+            console.log("Authorised");
+        }
+
     }
 
     stop() {

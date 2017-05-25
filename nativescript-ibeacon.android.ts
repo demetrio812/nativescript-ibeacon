@@ -1,8 +1,14 @@
-import {Beacon, BeaconCallback, BeaconRegion, Common} from './nativescript-ibeacon.common';
+import {
+    Beacon, BeaconCallback, BeaconLocationOptionsAndroidAuthType, BeaconRegion,
+    Common
+} from './nativescript-ibeacon.common';
 import * as utils from "utils/utils";
 import {setActivityCallbacks, AndroidActivityCallbacks} from "ui/frame";
 
-declare var org: any;
+var permissions = require( "nativescript-permissions" );
+
+declare let org: any;
+declare let android:any;
 
 @Interfaces([org.altbeacon.beacon.BeaconConsumer])
 export class LocationService extends java.lang.Object {
@@ -164,6 +170,24 @@ export class NativescriptIbeacon extends Common {
         super(beaconCallback);
         this.locationService = new LocationService(utils.ad.getApplicationContext());
         this.locationService.delegate = beaconCallback;
+    }
+
+    public requestAuthorization(): Promise<any> {
+        return permissions.requestPermission(this.getPermission(), this.options.androidAuthorisationDescription);
+    }
+
+    public isAuthorised() : boolean {
+        return permissions.hasPermission(this.getPermission());
+    }
+
+    private getPermission() {
+        let permission = null;
+        if (this.options.androidAuthorisationType==BeaconLocationOptionsAndroidAuthType.Coarse) {
+            permission = android.Manifest.permission.ACCESS_COARSE_LOCATION;
+        } else {
+            permission = android.Manifest.permission.ACCESS_FINE_LOCATION;
+        }
+        return permission;
     }
 
     public startRanging(beaconRegion: BeaconRegion) {

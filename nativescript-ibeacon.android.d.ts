@@ -22,6 +22,9 @@ export declare class LocationService extends java.lang.Object {
 export declare class NativescriptIbeacon extends Common {
     private locationService;
     constructor(beaconCallback: BeaconCallback);
+    requestAuthorization(): Promise<any>;
+    isAuthorised(): boolean;
+    private getPermission();
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
 }

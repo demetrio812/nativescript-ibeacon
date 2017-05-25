@@ -3,6 +3,6 @@
     <Label text="nativescript-ibeacon demo"></Label>
     <Button text="Start" tap="{{ start }}"></Button>
     <Button text="Stop" tap="{{ stop }}"></Button>
-    <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
+    <!--<Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>-->
   </StackLayout>
 </Page>
