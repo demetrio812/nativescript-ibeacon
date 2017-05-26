@@ -71,26 +71,14 @@ export class Beacon {
     public major: number;
     public minor: number;
 
-    private distance: number;
-    private rssi: number;
-    private txPower: number;
+    public distance_proximity: number;  // proximity in iOS
+    public rssi: number;
+    public txPower_accuracy: number;  // accuracy in iOS
 
     constructor(proximityUUID: string, major: number, minor: number) {
         this.proximityUUID = proximityUUID;
         this.major = major;
         this.minor = minor;
-    }
-
-    public setDistance(distance: number) {
-        this.distance = distance;
-    }
-
-    public setRssi(rssi: number) {
-        this.rssi = rssi;
-    }
-
-    public setTxPower(txPower: number) {
-        this.txPower = txPower;
     }
 }
 

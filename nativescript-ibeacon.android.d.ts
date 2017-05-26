@@ -4,6 +4,7 @@ export declare class LocationService extends java.lang.Object {
     delegate: BeaconCallback;
     private context;
     private beaconManagerReady;
+    private rangeNotifierAdded;
     private pendingBeaconRegion;
     constructor(context: android.content.Context);
     bind(): void;

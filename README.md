@@ -78,6 +78,21 @@ if (!nativescriptIbeacon.isAuthorised()) {
 ```typescript
 nativescriptIbeacon.stopRanging(region);
 ```
+
+### Note on the Beacon class
+The shared `Beacon` class contain the following values:
+    
+    
+    public proximityUUID: string;
+    public major: number;
+    public minor: number;
+
+    public rssi: number;
+    public distance_proximity: number;  // distance in Android, proximity in iOS
+    public txPower_accuracy: number;  // txPower in Android, accuracy in iOS
+    
+As you can see there is some difference on iOS and Android platform regarding the last 2 values. Keep this in mind while using the class.
+
 ### TODO
 * Better Demo
 * Region monitoring

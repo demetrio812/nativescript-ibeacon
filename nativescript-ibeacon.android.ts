@@ -18,6 +18,7 @@ export class LocationService extends java.lang.Object {
     private context: android.content.Context;
 
     private beaconManagerReady: boolean = false;
+    private rangeNotifierAdded: boolean = false;
 
     private pendingBeaconRegion: BeaconRegion = null;
 
@@ -34,6 +35,7 @@ export class LocationService extends java.lang.Object {
     }
 
     public unbind() {
+        this.beaconManagerReady = false;
         this.getBeaconManager().unbind(this);
     }
 
@@ -68,7 +70,7 @@ export class LocationService extends java.lang.Object {
             console.log("stopRanging");
             this.getBeaconManager().stopRangingBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
             this.unbind();
-            this.beaconManager = null;
+            //this.beaconManager = null;
             //this.myCallback = null;
         } else {
             console.log("startRanging stopped: beacon manager not ready");
@@ -84,28 +86,32 @@ export class LocationService extends java.lang.Object {
         console.log("onBeaconServiceConnect");
         this.beaconManagerReady = true;
         let me = this;
-        this.getBeaconManager().addRangeNotifier(new org.altbeacon.beacon.RangeNotifier({
 
-            didRangeBeaconsInRegion: function (beacons: /*java.util.Collection<org.altbeacon.beacon.Beacon>*/any, region: /*org.altbeacon.beacon.Region*/any) {
-                console.log("didRangeBeaconsInRegion");
-                //if (beacons.size() > 0) {
-                if (me.delegate) {
-                    let beaconsArray = beacons.toArray();
-                    let beaconsList: Beacon[] = [];
-                    for (let c = 0; c < beaconsArray.length; c++) {
-                        let beacon = beaconsArray[c];
-                        beaconsList.push(me.getBeaconFromNativeBeacon(beacon));
+        if (!this.rangeNotifierAdded) {
+            this.rangeNotifierAdded = true;
+            this.getBeaconManager().addRangeNotifier(new org.altbeacon.beacon.RangeNotifier({
+
+                didRangeBeaconsInRegion: function (beacons: /*java.util.Collection<org.altbeacon.beacon.Beacon>*/any, region: /*org.altbeacon.beacon.Region*/any) {
+                    console.log("didRangeBeaconsInRegion");
+                    //if (beacons.size() > 0) {
+                    if (me.delegate) {
+                        let beaconsArray = beacons.toArray();
+                        let beaconsList: Beacon[] = [];
+                        for (let c = 0; c < beaconsArray.length; c++) {
+                            let beacon = beaconsArray[c];
+                            beaconsList.push(me.getBeaconFromNativeBeacon(beacon));
+                        }
+                        /*while (beacons.iterator().hasNext()) {
+                         let beacon = beacons.iterator().next();
+                         //console.log("TEST", "LS: The first beacon " + beacon.getId1().toUuid().toString() + " I see is about " + beacon.getDistance() + " meters away.");
+                         beaconsList.push(me.getBeaconFromNativeBeacon(beacon));
+                         }*/
+                        me.delegate.didRangeBeaconsInRegion(me.getBeaconRegionFromRegion(region), beaconsList);
                     }
-                    /*while (beacons.iterator().hasNext()) {
-                     let beacon = beacons.iterator().next();
-                     //console.log("TEST", "LS: The first beacon " + beacon.getId1().toUuid().toString() + " I see is about " + beacon.getDistance() + " meters away.");
-                     beaconsList.push(me.getBeaconFromNativeBeacon(beacon));
-                     }*/
-                    me.delegate.didRangeBeaconsInRegion(me.getBeaconRegionFromRegion(region), beaconsList);
+                    //}
                 }
-                //}
-            }
-        }));
+            }));
+        }
 
         if (this.pendingBeaconRegion != null) {
             this.startRanging(this.pendingBeaconRegion);
@@ -142,9 +148,9 @@ export class LocationService extends java.lang.Object {
 
     getBeaconFromNativeBeacon(nativeBeacon: any): Beacon {
         let beacon = new Beacon(nativeBeacon.getId1().toString(), nativeBeacon.getId2().toInt(), nativeBeacon.getId3().toInt());
-        beacon.setDistance(nativeBeacon.getDistance());
-        beacon.setRssi(nativeBeacon.getRssi());
-        beacon.setTxPower(nativeBeacon.getTxPower());
+        beacon.distance_proximity = nativeBeacon.getDistance();
+        beacon.rssi = nativeBeacon.getRssi();
+        beacon.txPower_accuracy = nativeBeacon.getTxPower();
         return beacon;
     }
 

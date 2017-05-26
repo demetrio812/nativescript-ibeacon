@@ -39,6 +39,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
                 })
         } else {
             console.log("Authorised");
+            this.nativescriptIbeacon.startRanging(this.region);
         }
 
     }
@@ -52,7 +53,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         console.log("didRangeBeaconsInRegion: " + region.identifier + " - " + beacons.length);
         //this.message = "didRangeBeaconsInRegion: " + (new Date().toDateString());
         for (let beacon of beacons) {
-            console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor);
+            console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy );
         }
     }
 

@@ -93,6 +93,9 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
 
     private getBeacon(clBeacon: CLBeacon): Beacon {
         let beacon: Beacon = new Beacon(clBeacon.proximityUUID.UUIDString, clBeacon.major, clBeacon.minor);
+        beacon.distance_proximity = clBeacon.proximity;
+        beacon.rssi = clBeacon.rssi;
+        beacon.txPower_accuracy = clBeacon.accuracy;
         return beacon;
     }
 

@@ -35,11 +35,8 @@ export declare class Beacon {
     proximityUUID: string;
     major: number;
     minor: number;
-    private distance;
-    private rssi;
-    private txPower;
+    distance_proximity: number;
+    rssi: number;
+    txPower_accuracy: number;
     constructor(proximityUUID: string, major: number, minor: number);
-    setDistance(distance: number): void;
-    setRssi(rssi: number): void;
-    setTxPower(txPower: number): void;
 }
