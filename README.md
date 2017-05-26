@@ -93,6 +93,18 @@ The shared `Beacon` class contain the following values:
     
 As you can see there is some difference on iOS and Android platform regarding the last 2 values. Keep this in mind while using the class.
 
+### Run the demo
+
+Please note that you need a real device to test beacon ranging (you will receive an error otherwise).
+
+To run the demo you can use one of the following commands:
+
+    npm run demo.ios.device
+
+or
+
+    npm run demo.android.device
+    
 ### TODO
 * Better Demo
 * Region monitoring
