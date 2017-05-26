@@ -82,7 +82,6 @@ nativescriptIbeacon.stopRanging(region);
 ### Note on the Beacon class
 The shared `Beacon` class contain the following values:
     
-    
     public proximityUUID: string;
     public major: number;
     public minor: number;
@@ -92,6 +91,25 @@ The shared `Beacon` class contain the following values:
     public txPower_accuracy: number;  // txPower in Android, accuracy in iOS
     
 As you can see there is some difference on iOS and Android platform regarding the last 2 values. Keep this in mind while using the class.
+
+On iOS, the values for proximity are:
+
+    public enum CLProximity : Int {
+        case unknown  // =0
+        case immediate  // =1
+        case near  // =2
+        case far  // =3
+    }    
+    
+    The value in this property gives a general sense of the relative distance to the beacon. 
+    Use it to quickly identify beacons that are nearer to the user rather than farther away.
+    
+On iOS, accuracy is described like:
+
+    Indicates the one sigma horizontal accuracy in meters. Use this property to differentiate between beacons with the same proximity value. Do not use it to identify a precise location for the beacon. Accuracy values may fluctuate due to RF interference.
+    A negative value in this property signifies that the actual accuracy could not be determined.
+    
+    public typealias CLLocationAccuracy = Double
 
 ### Run the demo
 
