@@ -108,7 +108,7 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
         for (let i = 0; i < beacons.count; i++) {
             let beacon = this.getBeacon(beacons[i]);
             jsBeacons.push(beacon);
-            console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor);
+            console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy);
         }
         if (this.delegate) {
             this.delegate.didRangeBeaconsInRegion(this.getBeaconRegion(region), jsBeacons);
