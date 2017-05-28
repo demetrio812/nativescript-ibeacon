@@ -1,3 +1,6 @@
+[![npm](https://img.shields.io/npm/v/nativescript-ibeacon.svg)](https://www.npmjs.com/package/nativescript-ibeacon)
+[![npm](https://img.shields.io/npm/dt/nativescript-ibeacon.svg?label=npm%20downloads)](https://www.npmjs.com/package/nativescript-ibeacon)
+
 # NativeScript iBeacon
 Let you range for iBeacons, managing permissions. iOS and Android.
 
