@@ -2,6 +2,8 @@ import { Observable } from 'data/observable';
 export interface BeaconCallback {
     didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]): void;
     didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string): void;
+    didEnterRegion?(region: BeaconRegion): void;
+    didExitRegion?(region: BeaconRegion): void;
 }
 export declare enum BeaconLocationOptionsIOSAuthType {
     Always = 0,
@@ -23,6 +25,8 @@ export declare class Common extends Observable {
     isAuthorised(): boolean;
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
+    startMonitoring(beaconRegion: BeaconRegion): void;
+    stopMonitoring(beaconRegion: BeaconRegion): void;
 }
 export declare class BeaconRegion {
     identifier: string;

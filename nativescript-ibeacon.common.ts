@@ -5,6 +5,8 @@ import * as dialogs from 'ui/dialogs';
 export interface BeaconCallback {
     didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]): void;
     didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string): void;
+    didEnterRegion?(region: BeaconRegion): void;
+    didExitRegion?(region: BeaconRegion): void;
 }
 
 export enum BeaconLocationOptionsIOSAuthType {
@@ -48,6 +50,14 @@ export class Common extends Observable {
     }
 
     public stopRanging(beaconRegion: BeaconRegion) {
+
+    }
+
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
 
     }
 }

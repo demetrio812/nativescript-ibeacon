@@ -50,10 +50,10 @@
   "homepage": "https://github.com/demetrio812/nativescript-ibeacon",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "prompt": "~1.0.0",
+    "rimraf": "~2.5.0",
     "tns-core-modules": "~3.0.0",
     "tns-platform-declarations": "^3.0.1",
-    "typescript": "~2.2.1",
-    "prompt": "~1.0.0",
-    "rimraf": "~2.5.0"
+    "typescript": "~2.2.1"
   }
 }

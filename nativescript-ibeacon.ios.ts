@@ -72,6 +72,34 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
         this.getLocationManager().stopRangingBeaconsInRegion(region);
     }
 
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        console.log("startMonitoring");
+        let region = this.getCLBeaconRegion(beaconRegion);
+        this.getLocationManager().startMonitoringForRegion(region);
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
+        console.log("stopMonitoring");
+        let region = this.getCLBeaconRegion(beaconRegion);
+        this.getLocationManager().stopMonitoringForRegion(region);
+    }
+
+    public locationManagerDidEnterRegion(manager: CLLocationManager, region: CLBeaconRegion) {
+        console.log("locationManagerDidEnterRegion");
+        if (this.delegate.didEnterRegion) {
+            this.delegate.didEnterRegion(this.getBeaconRegion(region));
+        }
+    };
+
+    public locationManagerDidExitRegion(manager: CLLocationManager, region: CLBeaconRegion) {
+        console.log("locationManagerDidExitRegion");
+        if (this.delegate.didEnterRegion) {
+            this.delegate.didExitRegion(this.getBeaconRegion(region));
+        }
+    };
+
+
+
     // Utils
 
     private getCLBeaconRegion(beaconRegion: BeaconRegion): CLBeaconRegion {
@@ -102,13 +130,13 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
     // Callbacks
 
     locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager, beacons: NSArray<CLBeacon>, region: CLBeaconRegion): void {
-        console.log("locationManagerDidRangeBeaconsInRegion:" + region.identifier + ": " + beacons.count);
+        // console.log("locationManagerDidRangeBeaconsInRegion:" + region.identifier + ": " + beacons.count);
         // for (let beacon of beacons.iter) {
         let jsBeacons: Beacon[] = [];
         for (let i = 0; i < beacons.count; i++) {
             let beacon = this.getBeacon(beacons[i]);
             jsBeacons.push(beacon);
-            console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy);
+            // console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy);
         }
         if (this.delegate) {
             this.delegate.didRangeBeaconsInRegion(this.getBeaconRegion(region), jsBeacons);
@@ -175,5 +203,12 @@ export class NativescriptIbeacon extends Common {
         this.locationService.stopRanging(beaconRegion);
     }
 
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        this.locationService.startMonitoring(beaconRegion);
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
+        this.locationService.stopMonitoring(beaconRegion);
+    }
 
 }
