@@ -19,6 +19,7 @@ export class LocationService extends java.lang.Object {
 
     private beaconManagerReady: boolean = false;
     private rangeNotifierAdded: boolean = false;
+    private monitorNotifierAdded: boolean = false;
 
     private pendingBeaconRegion: BeaconRegion = null;
 
@@ -77,6 +78,14 @@ export class LocationService extends java.lang.Object {
         }
     }
 
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        console.log("startMonitoring");
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
+        console.log("stopMonitoring");
+    }
+
     /*private getContext() {
      let context = application.android.context;
      return context
@@ -111,6 +120,28 @@ export class LocationService extends java.lang.Object {
                     //}
                 }
             }));
+        }
+
+        if (!this.monitorNotifierAdded) {
+            this.monitorNotifierAdded = true;
+            /*
+            this.getBeaconManager().addMonitorNotifier(new org.altbeacon.beacon.MonitorNotifier({
+
+                didEnterRegion: function (region: any) {
+                    console.log("didEnterRegion");
+                    if (me.delegate) {
+                        me.delegate.didEnterRegion(me.getBeaconRegionFromRegion(region));
+                    }
+                },
+                didExitRegion: function (region: any) {
+                    console.log("didExitRegion");
+                    if (me.delegate) {
+                        me.delegate.didExitRegion(me.getBeaconRegionFromRegion(region));
+                    }
+                }
+            }));
+            */
+            console.log('should add a monintorNotifier');
         }
 
         if (this.pendingBeaconRegion != null) {
@@ -204,5 +235,12 @@ export class NativescriptIbeacon extends Common {
         this.locationService.stopRanging(beaconRegion);
     }
 
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        this.locationService.startMonitoring(beaconRegion);
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
+        this.locationService.stopMonitoring(beaconRegion);
+    }
 
 }

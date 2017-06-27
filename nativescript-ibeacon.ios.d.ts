@@ -31,4 +31,5 @@ export declare class NativescriptIbeacon extends Common {
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
     startMonitoring(beaconRegion: BeaconRegion): void;
+    stopMonitoring(beaconRegion: BeaconRegion): void;
 }
