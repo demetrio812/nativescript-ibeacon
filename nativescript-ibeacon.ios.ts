@@ -93,7 +93,7 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
 
     public locationManagerDidExitRegion(manager: CLLocationManager, region: CLBeaconRegion) {
         console.log("locationManagerDidExitRegion");
-        if (this.delegate.didEnterRegion) {
+        if (this.delegate.didExitRegion) {
             this.delegate.didExitRegion(this.getBeaconRegion(region));
         }
     };
