@@ -74,22 +74,30 @@ export class LocationService extends java.lang.Object {
             //this.beaconManager = null;
             //this.myCallback = null;
         } else {
-            console.log("startRanging stopped: beacon manager not ready");
+            console.log("stopRanging stopped: beacon manager not ready");
         }
     }
 
     public startMonitoring(beaconRegion: BeaconRegion) {
-        console.log("startMonitoring");
+        if (this.beaconManagerReady) {
+            console.log("startMonitoring3");
+            this.getBeaconManager().startMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
+        } else {
+            console.log("startMonitoring3 stopped: beacon manager not ready");
+            this.pendingBeaconRegion = beaconRegion;
+            this.bind(); // init the beacon manager
+        }
     }
 
     public stopMonitoring(beaconRegion: BeaconRegion) {
-        console.log("stopMonitoring");
+        if (this.beaconManagerReady) {
+            console.log("stopMonitoring");
+            this.getBeaconManager().stopMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
+            this.unbind();
+        } else {
+            console.log("stopMonitoring stopped: beacon manager not ready");
+        }
     }
-
-    /*private getContext() {
-     let context = application.android.context;
-     return context
-     }*/
 
     public onBeaconServiceConnect() {
         console.log("onBeaconServiceConnect");
@@ -101,7 +109,7 @@ export class LocationService extends java.lang.Object {
             this.getBeaconManager().addRangeNotifier(new org.altbeacon.beacon.RangeNotifier({
 
                 didRangeBeaconsInRegion: function (beacons: /*java.util.Collection<org.altbeacon.beacon.Beacon>*/any, region: /*org.altbeacon.beacon.Region*/any) {
-                    console.log("didRangeBeaconsInRegion");
+                    //console.log("didRangeBeaconsInRegion");
                     //if (beacons.size() > 0) {
                     if (me.delegate) {
                         let beaconsArray = beacons.toArray();
@@ -124,7 +132,6 @@ export class LocationService extends java.lang.Object {
 
         if (!this.monitorNotifierAdded) {
             this.monitorNotifierAdded = true;
-            /*
             this.getBeaconManager().addMonitorNotifier(new org.altbeacon.beacon.MonitorNotifier({
 
                 didEnterRegion: function (region: any) {
@@ -138,14 +145,19 @@ export class LocationService extends java.lang.Object {
                     if (me.delegate) {
                         me.delegate.didExitRegion(me.getBeaconRegionFromRegion(region));
                     }
+                },
+                didDetermineStateForRegion: function (state: number, region: any) {
+                    console.log("didDetermineStateForRegion");
+                    console.log(state);
+                    console.log(region);
                 }
             }));
-            */
-            console.log('should add a monintorNotifier');
+            console.log('should add a monitorNotifier');
         }
 
         if (this.pendingBeaconRegion != null) {
             this.startRanging(this.pendingBeaconRegion);
+            this.startMonitoring(this.pendingBeaconRegion);
             this.pendingBeaconRegion = null;
         }
     }
