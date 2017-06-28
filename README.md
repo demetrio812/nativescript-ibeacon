@@ -99,6 +99,12 @@ if (!nativescriptIbeacon.isAuthorised()) {
 nativescriptIbeacon.stopRanging(region);
 ```
 
+###### Stop monitoring
+
+```typescript
+nativescriptIbeacon.stopMonitoring(region);
+```
+
 ### Note on the Beacon class
 The shared `Beacon` class contain the following values:
     
