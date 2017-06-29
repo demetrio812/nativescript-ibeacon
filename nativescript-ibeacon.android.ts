@@ -22,6 +22,7 @@ export class LocationService extends java.lang.Object {
     private monitorNotifierAdded: boolean = false;
 
     private pendingBeaconRegion: BeaconRegion = null;
+    private pendingBeaconMonitor: BeaconRegion = null;
 
     constructor(context: android.content.Context) {
         super();
@@ -80,10 +81,10 @@ export class LocationService extends java.lang.Object {
 
     public startMonitoring(beaconRegion: BeaconRegion) {
         if (this.beaconManagerReady) {
-            console.log("startMonitoring3");
+            console.log("startMonitoring");
             this.getBeaconManager().startMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
         } else {
-            console.log("startMonitoring3 stopped: beacon manager not ready");
+            console.log("startMonitoring stopped: beacon manager not ready");
             this.pendingBeaconRegion = beaconRegion;
             this.bind(); // init the beacon manager
         }
@@ -135,14 +136,14 @@ export class LocationService extends java.lang.Object {
             this.getBeaconManager().addMonitorNotifier(new org.altbeacon.beacon.MonitorNotifier({
 
                 didEnterRegion: function (region: any) {
-                    console.log("didEnterRegion");
-                    if (me.delegate) {
+                    console.log("didEnterRegion", me.delegate, region);
+                    if (me.delegate && me.delegate.didEnterRegion) {
                         me.delegate.didEnterRegion(me.getBeaconRegionFromRegion(region));
                     }
                 },
                 didExitRegion: function (region: any) {
                     console.log("didExitRegion");
-                    if (me.delegate) {
+                    if (me.delegate && me.delegate.didExitRegion) {
                         me.delegate.didExitRegion(me.getBeaconRegionFromRegion(region));
                     }
                 },
@@ -157,9 +158,15 @@ export class LocationService extends java.lang.Object {
 
         if (this.pendingBeaconRegion != null) {
             this.startRanging(this.pendingBeaconRegion);
-            this.startMonitoring(this.pendingBeaconRegion);
             this.pendingBeaconRegion = null;
         }
+
+        if (this.pendingBeaconMonitor != null) {
+            this.startMonitoring(this.pendingBeaconMonitor);
+            this.pendingBeaconMonitor = null;
+        }
+
+
     }
 
     getRegionFromBeaconRegion(beaconRegion: BeaconRegion): any {

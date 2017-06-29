@@ -7,6 +7,7 @@ export declare class LocationService extends java.lang.Object {
     private rangeNotifierAdded;
     private monitorNotifierAdded;
     private pendingBeaconRegion;
+    private pendingBeaconMonitor;
     constructor(context: android.content.Context);
     bind(): void;
     unbind(): void;
