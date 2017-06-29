@@ -85,7 +85,7 @@ export class LocationService extends java.lang.Object {
             this.getBeaconManager().startMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
         } else {
             console.log("startMonitoring stopped: beacon manager not ready");
-            this.pendingBeaconRegion = beaconRegion;
+            this.pendingBeaconMonitor = beaconRegion;
             this.bind(); // init the beacon manager
         }
     }
