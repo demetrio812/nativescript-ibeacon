@@ -45,9 +45,9 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
     }
 
     private getLocationManager(): CLLocationManager {
-        console.log("getLocationManager: " + this.locationManager);
+        // console.log("getLocationManager: " + this.locationManager);
         if (!this.locationManager) {
-            console.log("getLocationManager2: " + this.locationManager);
+            // console.log("getLocationManager2: " + this.locationManager);
             // this.locationManager = this.createiOSLocationManager(this, null);
             this.locationManager = new CLLocationManager();
             this.locationManager.delegate = this;
@@ -56,8 +56,21 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
             // locationManagers[locListener.id] = iosLocManager;
             // locationListeners[locListener.id] = locListener;
         }
-        console.log("getLocationManager3: " + this.locationManager);
+        // console.log("getLocationManager3: " + this.locationManager);
         return this.locationManager;
+    }
+
+    public bind() {
+        // init the location manager (if it's not already created)
+        this.getLocationManager();
+        // send the onBeaconManagerReady event
+        if (this.delegate && this.delegate.onBeaconManagerReady) {
+            this.delegate.onBeaconManagerReady();
+        }
+    }
+
+    public unbind() {
+        this.locationManager = null;
     }
 
     public startRanging(beaconRegion: BeaconRegion) {
@@ -83,22 +96,6 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
         let region = this.getCLBeaconRegion(beaconRegion);
         this.getLocationManager().stopMonitoringForRegion(region);
     }
-
-    public locationManagerDidEnterRegion(manager: CLLocationManager, region: CLBeaconRegion) {
-        console.log("locationManagerDidEnterRegion");
-        if (this.delegate.didEnterRegion) {
-            this.delegate.didEnterRegion(this.getBeaconRegion(region));
-        }
-    };
-
-    public locationManagerDidExitRegion(manager: CLLocationManager, region: CLBeaconRegion) {
-        console.log("locationManagerDidExitRegion");
-        if (this.delegate.didExitRegion) {
-            this.delegate.didExitRegion(this.getBeaconRegion(region));
-        }
-    };
-
-
 
     // Utils
 
@@ -129,6 +126,20 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
 
     // Callbacks
 
+    public locationManagerDidEnterRegion(manager: CLLocationManager, region: CLBeaconRegion) {
+        console.log("locationManagerDidEnterRegion");
+        if (this.delegate && this.delegate.didEnterRegion) {
+            this.delegate.didEnterRegion(this.getBeaconRegion(region));
+        }
+    };
+
+    public locationManagerDidExitRegion(manager: CLLocationManager, region: CLBeaconRegion) {
+        console.log("locationManagerDidExitRegion");
+        if (this.delegate && this.delegate.didExitRegion) {
+            this.delegate.didExitRegion(this.getBeaconRegion(region));
+        }
+    };
+
     locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager, beacons: NSArray<CLBeacon>, region: CLBeaconRegion): void {
         // console.log("locationManagerDidRangeBeaconsInRegion:" + region.identifier + ": " + beacons.count);
         // for (let beacon of beacons.iter) {
@@ -138,14 +149,14 @@ export class LocationService extends NSObject implements CLLocationManagerDelega
             jsBeacons.push(beacon);
             // console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy);
         }
-        if (this.delegate) {
+        if (this.delegate && this.delegate.didRangeBeaconsInRegion) {
             this.delegate.didRangeBeaconsInRegion(this.getBeaconRegion(region), jsBeacons);
         }
     }
 
     locationManagerRangingBeaconsDidFailForRegionWithError(manager: CLLocationManager, region: CLBeaconRegion, error: NSError): void {
         console.log("locationManagerRangingBeaconsDidFailForRegionWithError: " + region.identifier + ": " + error.description);
-        if (this.delegate && error) {
+        if (this.delegate && this.delegate.didFailRangingBeaconsInRegion && error) {
             this.delegate.didFailRangingBeaconsInRegion(this.getBeaconRegion(region), error.code, error.description);
         }
     }
@@ -193,6 +204,14 @@ export class NativescriptIbeacon extends Common {
 
     public isAuthorised(): boolean {
         return this.locationService.isAuthorised();
+    }
+
+    public bind() {
+        this.locationService.bind();
+    }
+
+    public unbind() {
+        this.locationService.unbind();
     }
 
     public startRanging(beaconRegion: BeaconRegion) {

@@ -3,6 +3,7 @@ import * as app from 'application';
 import * as dialogs from 'ui/dialogs';
 
 export interface BeaconCallback {
+    onBeaconManagerReady(): void;
     didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]): void;
     didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string): void;
     didEnterRegion?(region: BeaconRegion): void;
@@ -43,6 +44,14 @@ export class Common extends Observable {
 
     public isAuthorised() : boolean {
         return false;
+    }
+
+    public bind() {
+
+    }
+
+    public unbind() {
+
     }
 
     public startRanging(beaconRegion: BeaconRegion) {

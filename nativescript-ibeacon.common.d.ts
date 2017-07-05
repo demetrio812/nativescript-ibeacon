@@ -1,5 +1,6 @@
 import { Observable } from 'data/observable';
 export interface BeaconCallback {
+    onBeaconManagerReady(): void;
     didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]): void;
     didFailRangingBeaconsInRegion(region: BeaconRegion, errorCode: number, errorDescription: string): void;
     didEnterRegion?(region: BeaconRegion): void;
@@ -23,6 +24,8 @@ export declare class Common extends Observable {
     constructor(beaconCallback: BeaconCallback, options?: BeaconLocationOptions);
     requestAuthorization(): Promise<any>;
     isAuthorised(): boolean;
+    bind(): void;
+    unbind(): void;
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
     startMonitoring(beaconRegion: BeaconRegion): void;

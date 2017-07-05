@@ -39,6 +39,11 @@ you can also use `android.permission.ACCESS_FINE_LOCATION` instead of `android.p
 import {NativescriptIbeacon, BeaconCallback, BeaconLocationOptions, BeaconLocationOptionsIOSAuthType, BeaconLocationOptionsAndroidAuthType, BeaconRegion, Beacon } from 'nativescript-ibeacon';
 
 let callback: BeaconCallback = {
+    onBeaconManagerReady(): void {
+        // start ranging and/or monitoring only when the beacon manager is ready
+        this.nativescriptIbeacon.startRanging(this.region);
+        this.nativescriptIbeacon.startMonitoring(this.region);
+    },
     didRangeBeaconsInRegion: function(region: BeaconRegion, beacons: Beacon[]) {
 
     },
@@ -59,7 +64,8 @@ let region = new BeaconRegion("HelloID", "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6")
 
 ```
 
-###### Request for permissions and Start ranging
+###### Request for permissions and bind BeaconManager
+We need to be sure to have permission and we need to prepare the BeaconManager by calling `bind()`.
 
 ```typescript
 if (!nativescriptIbeacon.isAuthorised()) {
@@ -67,32 +73,20 @@ if (!nativescriptIbeacon.isAuthorised()) {
     nativescriptIbeacon.requestAuthorization()
         .then(() => {
             console.log("Authorised by the user");
-            nativescriptIbeacon.startRanging(region);
+            nativescriptIbeacon.bind();
 
         }, (e) => {
             console.log("Authorisation denied by the user");
         })
 } else {
-    console.log("Authorised");
-}
-
-###### Request for permissions and Start monitoring
-
-```typescript
-if (!nativescriptIbeacon.isAuthorised()) {
-    console.log("NOT Authorised");
-    nativescriptIbeacon.requestAuthorization()
-        .then(() => {
-            console.log("Authorised by the user");
-            nativescriptIbeacon.startMonitoring(region);
-
-        }, (e) => {
-            console.log("Authorisation denied by the user");
-        })
-} else {
-    console.log("Authorised");
+    console.log("Already authorised");
+    nativescriptIbeacon.bind();
 }
 ```
+After the BeaconManager is ready, the event `onBeaconManagerReady()` is called. After that we can call `startRanging(region)` or `startMonitoring(region)`.
+
+If we call `startRanging(region)` or `startMonitoring(region)` before calling `bind()`, it will be called internally and the region will be registered after the BeaconManager will be ready.
+
 ###### Stop ranging
 
 ```typescript
@@ -103,6 +97,13 @@ nativescriptIbeacon.stopRanging(region);
 
 ```typescript
 nativescriptIbeacon.stopMonitoring(region);
+```
+
+###### Unbind
+To dispose the BeaconManager, call the method `unbind()`
+
+```typescript
+nativescriptIbeacon.unbind();
 ```
 
 ### Note on the Beacon class

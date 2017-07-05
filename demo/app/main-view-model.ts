@@ -6,6 +6,7 @@ import {
 import {NativescriptIbeacon} from "nativescript-ibeacon";
 
 export class HelloWorldModel extends Observable implements BeaconCallback {
+
     private nativescriptIbeacon: NativescriptIbeacon;
 
     public message: string = "Init";
@@ -32,16 +33,14 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
             this.nativescriptIbeacon.requestAuthorization()
                 .then(() => {
                     console.log("Authorised by the user");
-                    this.nativescriptIbeacon.startRanging(this.region);
-                    this.nativescriptIbeacon.startMonitoring(this.region);
+                    this.nativescriptIbeacon.bind();
 
                 }, (e) => {
                     console.log("Authorisation denied by the user");
                 })
         } else {
-            console.log("Authorised");
-            this.nativescriptIbeacon.startRanging(this.region);
-            this.nativescriptIbeacon.startMonitoring(this.region);
+            console.log("Already authorised");
+            this.nativescriptIbeacon.bind();
         }
 
     }
@@ -49,13 +48,21 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
     stop() {
         this.message = "stop";
         this.nativescriptIbeacon.stopRanging(this.region);
+        this.nativescriptIbeacon.stopMonitoring(this.region);
+        this.nativescriptIbeacon.unbind();
+    }
+
+    onBeaconManagerReady(): void {
+        console.log("onBeaconManagerReady");
+        this.nativescriptIbeacon.startRanging(this.region);
+        this.nativescriptIbeacon.startMonitoring(this.region);
     }
 
     didRangeBeaconsInRegion(region: BeaconRegion, beacons: Beacon[]): void {
-        // console.log("didRangeBeaconsInRegion: " + region.identifier + " - " + beacons.length);
+        //console.log("didRangeBeaconsInRegion: " + region.identifier + " - " + beacons.length);
         //this.message = "didRangeBeaconsInRegion: " + (new Date().toDateString());
         for (let beacon of beacons) {
-            // console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy );
+            console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy );
         }
     }
 
@@ -64,12 +71,12 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
     }
 
     didEnterRegion(region: BeaconRegion) {
-        console.log(region);
+        //console.log(region);
         console.log('Did enter Region ' + region.identifier);
     }
 
     didExitRegion(region: BeaconRegion) {
-        console.log(region);
+        //console.log(region);
         console.log('Did leave Region '  + region.identifier);
     }
 

@@ -56,7 +56,7 @@ export class LocationService extends java.lang.Object {
             try {
                 console.log("startRangingBeaconsInRegion");
                 this.getBeaconManager().startRangingBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion)); //
-                console.log("startRangingBeaconsInRegion2");
+                //console.log("startRangingBeaconsInRegion2");
             } catch (e) {
                 //e.printStackTrace();
             }
@@ -71,9 +71,6 @@ export class LocationService extends java.lang.Object {
         if (this.beaconManagerReady) {
             console.log("stopRanging");
             this.getBeaconManager().stopRangingBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
-            this.unbind();
-            //this.beaconManager = null;
-            //this.myCallback = null;
         } else {
             console.log("stopRanging stopped: beacon manager not ready");
         }
@@ -94,7 +91,6 @@ export class LocationService extends java.lang.Object {
         if (this.beaconManagerReady) {
             console.log("stopMonitoring");
             this.getBeaconManager().stopMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
-            this.unbind();
         } else {
             console.log("stopMonitoring stopped: beacon manager not ready");
         }
@@ -118,12 +114,8 @@ export class LocationService extends java.lang.Object {
                         for (let c = 0; c < beaconsArray.length; c++) {
                             let beacon = beaconsArray[c];
                             beaconsList.push(me.getBeaconFromNativeBeacon(beacon));
+                            //console.log("TEST", "LS: The first beacon " + beacon.getId1().toUuid().toString() + " I see is about " + beacon.getDistance() + " meters away.");
                         }
-                        /*while (beacons.iterator().hasNext()) {
-                         let beacon = beacons.iterator().next();
-                         //console.log("TEST", "LS: The first beacon " + beacon.getId1().toUuid().toString() + " I see is about " + beacon.getDistance() + " meters away.");
-                         beaconsList.push(me.getBeaconFromNativeBeacon(beacon));
-                         }*/
                         me.delegate.didRangeBeaconsInRegion(me.getBeaconRegionFromRegion(region), beaconsList);
                     }
                     //}
@@ -153,8 +145,14 @@ export class LocationService extends java.lang.Object {
                     console.log(region);
                 }
             }));
-            console.log('should add a monitorNotifier');
         }
+
+        // Beacon manager ready
+        if (me.delegate && me.delegate.onBeaconManagerReady) {
+            me.delegate.onBeaconManagerReady();
+        }
+
+        // Checking pending reagions
 
         if (this.pendingBeaconRegion != null) {
             this.startRanging(this.pendingBeaconRegion);
@@ -165,7 +163,6 @@ export class LocationService extends java.lang.Object {
             this.startMonitoring(this.pendingBeaconMonitor);
             this.pendingBeaconMonitor = null;
         }
-
 
     }
 
@@ -244,6 +241,14 @@ export class NativescriptIbeacon extends Common {
             permission = android.Manifest.permission.ACCESS_FINE_LOCATION;
         }
         return permission;
+    }
+
+    public bind() {
+        this.locationService.bind();
+    }
+
+    public unbind() {
+        this.locationService.unbind();
     }
 
     public startRanging(beaconRegion: BeaconRegion) {

@@ -30,6 +30,8 @@ export declare class NativescriptIbeacon extends Common {
     requestAuthorization(): Promise<any>;
     isAuthorised(): boolean;
     private getPermission();
+    bind(): void;
+    unbind(): void;
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
     startMonitoring(beaconRegion: BeaconRegion): void;
