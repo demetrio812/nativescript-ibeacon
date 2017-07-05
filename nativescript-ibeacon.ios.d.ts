@@ -12,6 +12,10 @@ export declare class LocationService extends NSObject implements CLLocationManag
     private getLocationManager();
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
+    startMonitoring(beaconRegion: BeaconRegion): void;
+    stopMonitoring(beaconRegion: BeaconRegion): void;
+    locationManagerDidEnterRegion(manager: CLLocationManager, region: CLBeaconRegion): void;
+    locationManagerDidExitRegion(manager: CLLocationManager, region: CLBeaconRegion): void;
     private getCLBeaconRegion(beaconRegion);
     private getBeaconRegion(clBeaconRegion);
     private getBeacon(clBeacon);
@@ -26,4 +30,6 @@ export declare class NativescriptIbeacon extends Common {
     isAuthorised(): boolean;
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
+    startMonitoring(beaconRegion: BeaconRegion): void;
+    stopMonitoring(beaconRegion: BeaconRegion): void;
 }

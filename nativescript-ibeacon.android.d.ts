@@ -5,13 +5,17 @@ export declare class LocationService extends java.lang.Object {
     private context;
     private beaconManagerReady;
     private rangeNotifierAdded;
+    private monitorNotifierAdded;
     private pendingBeaconRegion;
+    private pendingBeaconMonitor;
     constructor(context: android.content.Context);
     bind(): void;
     unbind(): void;
     private getBeaconManager();
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
+    startMonitoring(beaconRegion: BeaconRegion): void;
+    stopMonitoring(beaconRegion: BeaconRegion): void;
     onBeaconServiceConnect(): void;
     getRegionFromBeaconRegion(beaconRegion: BeaconRegion): any;
     getBeaconRegionFromRegion(region: any): BeaconRegion;
@@ -28,4 +32,6 @@ export declare class NativescriptIbeacon extends Common {
     private getPermission();
     startRanging(beaconRegion: BeaconRegion): void;
     stopRanging(beaconRegion: BeaconRegion): void;
+    startMonitoring(beaconRegion: BeaconRegion): void;
+    stopMonitoring(beaconRegion: BeaconRegion): void;
 }

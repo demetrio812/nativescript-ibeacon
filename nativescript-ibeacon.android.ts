@@ -19,8 +19,10 @@ export class LocationService extends java.lang.Object {
 
     private beaconManagerReady: boolean = false;
     private rangeNotifierAdded: boolean = false;
+    private monitorNotifierAdded: boolean = false;
 
     private pendingBeaconRegion: BeaconRegion = null;
+    private pendingBeaconMonitor: BeaconRegion = null;
 
     constructor(context: android.content.Context) {
         super();
@@ -73,14 +75,30 @@ export class LocationService extends java.lang.Object {
             //this.beaconManager = null;
             //this.myCallback = null;
         } else {
-            console.log("startRanging stopped: beacon manager not ready");
+            console.log("stopRanging stopped: beacon manager not ready");
         }
     }
 
-    /*private getContext() {
-     let context = application.android.context;
-     return context
-     }*/
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        if (this.beaconManagerReady) {
+            console.log("startMonitoring");
+            this.getBeaconManager().startMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
+        } else {
+            console.log("startMonitoring stopped: beacon manager not ready");
+            this.pendingBeaconMonitor = beaconRegion;
+            this.bind(); // init the beacon manager
+        }
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
+        if (this.beaconManagerReady) {
+            console.log("stopMonitoring");
+            this.getBeaconManager().stopMonitoringBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion));
+            this.unbind();
+        } else {
+            console.log("stopMonitoring stopped: beacon manager not ready");
+        }
+    }
 
     public onBeaconServiceConnect() {
         console.log("onBeaconServiceConnect");
@@ -92,7 +110,7 @@ export class LocationService extends java.lang.Object {
             this.getBeaconManager().addRangeNotifier(new org.altbeacon.beacon.RangeNotifier({
 
                 didRangeBeaconsInRegion: function (beacons: /*java.util.Collection<org.altbeacon.beacon.Beacon>*/any, region: /*org.altbeacon.beacon.Region*/any) {
-                    console.log("didRangeBeaconsInRegion");
+                    //console.log("didRangeBeaconsInRegion");
                     //if (beacons.size() > 0) {
                     if (me.delegate) {
                         let beaconsArray = beacons.toArray();
@@ -113,10 +131,42 @@ export class LocationService extends java.lang.Object {
             }));
         }
 
+        if (!this.monitorNotifierAdded) {
+            this.monitorNotifierAdded = true;
+            this.getBeaconManager().addMonitorNotifier(new org.altbeacon.beacon.MonitorNotifier({
+
+                didEnterRegion: function (region: any) {
+                    console.log("didEnterRegion", me.delegate, region);
+                    if (me.delegate && me.delegate.didEnterRegion) {
+                        me.delegate.didEnterRegion(me.getBeaconRegionFromRegion(region));
+                    }
+                },
+                didExitRegion: function (region: any) {
+                    console.log("didExitRegion");
+                    if (me.delegate && me.delegate.didExitRegion) {
+                        me.delegate.didExitRegion(me.getBeaconRegionFromRegion(region));
+                    }
+                },
+                didDetermineStateForRegion: function (state: number, region: any) {
+                    console.log("didDetermineStateForRegion");
+                    console.log(state);
+                    console.log(region);
+                }
+            }));
+            console.log('should add a monitorNotifier');
+        }
+
         if (this.pendingBeaconRegion != null) {
             this.startRanging(this.pendingBeaconRegion);
             this.pendingBeaconRegion = null;
         }
+
+        if (this.pendingBeaconMonitor != null) {
+            this.startMonitoring(this.pendingBeaconMonitor);
+            this.pendingBeaconMonitor = null;
+        }
+
+
     }
 
     getRegionFromBeaconRegion(beaconRegion: BeaconRegion): any {
@@ -204,5 +254,12 @@ export class NativescriptIbeacon extends Common {
         this.locationService.stopRanging(beaconRegion);
     }
 
+    public startMonitoring(beaconRegion: BeaconRegion) {
+        this.locationService.startMonitoring(beaconRegion);
+    }
+
+    public stopMonitoring(beaconRegion: BeaconRegion) {
+        this.locationService.stopMonitoring(beaconRegion);
+    }
 
 }

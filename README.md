@@ -75,11 +75,34 @@ if (!nativescriptIbeacon.isAuthorised()) {
 } else {
     console.log("Authorised");
 }
+
+###### Request for permissions and Start monitoring
+
+```typescript
+if (!nativescriptIbeacon.isAuthorised()) {
+    console.log("NOT Authorised");
+    nativescriptIbeacon.requestAuthorization()
+        .then(() => {
+            console.log("Authorised by the user");
+            nativescriptIbeacon.startMonitoring(region);
+
+        }, (e) => {
+            console.log("Authorisation denied by the user");
+        })
+} else {
+    console.log("Authorised");
+}
 ```
 ###### Stop ranging
 
 ```typescript
 nativescriptIbeacon.stopRanging(region);
+```
+
+###### Stop monitoring
+
+```typescript
+nativescriptIbeacon.stopMonitoring(region);
 ```
 
 ### Note on the Beacon class
@@ -128,6 +151,5 @@ or
     
 ### TODO
 * Better Demo
-* Region monitoring
 * Debug
 * More options
