@@ -23,7 +23,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
             androidAuthorisationDescription: "Location permission needed"
         };
         this.nativescriptIbeacon = new NativescriptIbeacon(this, options);
-        this.region = new BeaconRegion("HelloID", "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6");
+        this.region = new BeaconRegion("HelloID", "61687109-905f-4436-91f8-e602f514c96d", null, null);
     }
 
     start() {

@@ -44,7 +44,28 @@ export class LocationService extends java.lang.Object {
     private getBeaconManager() {
         if (this.beaconManager == null) {
             this.beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this.context/*utils.ad.getApplicationContext()*/);
-            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));  //iBeacon Layout
+            this.beaconManager.getBeaconParsers().clear();
+            // ALTBEACON
+            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().
+                    setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
+                console.log("beaconManager added ALTBEACON");
+            // EDDYSTONE TLM
+            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().
+                    setBeaconLayout("x,s:0-1=feaa,m:2-2=20,d:3-3,d:4-5,d:6-7,d:8-11,d:12-15"));
+                console.log("beaconManager added EDDYSTONE TLM");
+            // EDDYSTONE UID
+            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().
+                    setBeaconLayout("s:0-1=feaa,m:2-2=00,p:3-3:-41,i:4-13,i:14-19"));
+                console.log("beaconManager added EDDYSTONE UID");
+            // EDDYSTONE URL
+            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().
+                    setBeaconLayout("s:0-1=feaa,m:2-2=10,p:3-3:-41,i:4-20v"));
+                console.log("beaconManager added EDDYSTONE URL");
+            // IBEACON
+            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+            console.log("beaconManager added IBEACON");
+            // this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));  //iBeacon Layout
             console.log("beaconManager created");
         }
         return this.beaconManager;
