@@ -11,12 +11,23 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     public message: string = "Init";
 
+    public beaconInRange = {
+        id1: "",
+        id2: "",
+        id3: "",
+        distance: ""
+    };
+
+    private closestDistance: number = 99999;
+
     private region: BeaconRegion = null;
 
     constructor() {
         super();
 
         console.log('Hello World Model constructed');
+        this.resetBeaconInRange();
+
         let options: BeaconLocationOptions = {
             iOSAuthorisationType: BeaconLocationOptionsIOSAuthType.Always,
             androidAuthorisationType: BeaconLocationOptionsAndroidAuthType.Coarse,
@@ -29,6 +40,8 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     start() {
         this.message = "start";
+        this.resetBeaconInRange();
+
         if (!this.nativescriptIbeacon.isAuthorised()) {
             console.log("NOT Authorised");
             this.nativescriptIbeacon.requestAuthorization()
@@ -48,6 +61,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     stop() {
         this.message = "stop";
+        this.resetBeaconInRange();
         this.nativescriptIbeacon.stopRanging(this.region);
         this.nativescriptIbeacon.stopMonitoring(this.region);
         this.nativescriptIbeacon.unbind();
@@ -64,6 +78,13 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         //this.message = "didRangeBeaconsInRegion: " + (new Date().toDateString());
         for (let beacon of beacons) {
             console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy );
+            if (beacon.distance_proximity < this.closestDistance) {
+                this.closestDistance = beacon.distance_proximity;
+                this.beaconInRange.distance = beacon.distance_proximity;
+                this.beaconInRange.id1 = beacon.proximityUUID;
+                this.beaconInRange.id2 = beacon.major;
+                this.beaconInRange.id3 = beacon.minor;
+            }
         }
     }
 
@@ -78,7 +99,18 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     didExitRegion(region: BeaconRegion) {
         //console.log(region);
+        this.resetBeaconInRange();
         console.log('Did leave Region '  + region.identifier);
     }
+
+    resetBeaconInRange() {
+         this.beaconInRange = {
+            id1: "",
+            id2: "",
+            id3: "",
+            distance: ""
+        };
+        this.closestDistance = 99999;
+   }
 
 }
