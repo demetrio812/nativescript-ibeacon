@@ -7,6 +7,7 @@
     <Label text="{{ beaconInRange.id2 }}" horizontalAlignment="center"></Label>
     <Label text="{{ beaconInRange.id3 }}" horizontalAlignment="center"></Label>
     <Label text="{{ beaconInRange.distance }}" horizontalAlignment="center"></Label>
+    <Label text="{{ beaconInRange.updated }}" horizontalAlignment="center"></Label>
     <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
   </StackLayout>
 </Page>

@@ -15,7 +15,8 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         id1: "",
         id2: "",
         id3: "",
-        distance: ""
+        distance: "",
+        updated: ""
     };
 
     private closestDistance: number = 99999;
@@ -80,10 +81,11 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
             console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy );
             if (beacon.distance_proximity < this.closestDistance) {
                 this.closestDistance = beacon.distance_proximity;
-                this.beaconInRange.distance = beacon.distance_proximity;
+                this.beaconInRange.distance = beacon.distance_proximity.toString();
                 this.beaconInRange.id1 = beacon.proximityUUID;
-                this.beaconInRange.id2 = beacon.major;
-                this.beaconInRange.id3 = beacon.minor;
+                this.beaconInRange.id2 = beacon.major.toString();
+                this.beaconInRange.id3 = beacon.minor.toString();
+                this.beaconInRange.updated = (new Date().toDateString());
             }
         }
     }
@@ -108,7 +110,8 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
             id1: "",
             id2: "",
             id3: "",
-            distance: ""
+            distance: "",
+            updated: ""
         };
         this.closestDistance = 99999;
    }
