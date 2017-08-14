@@ -65,7 +65,6 @@ export class LocationService extends java.lang.Object {
             this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().
                 setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
             console.log("beaconManager added IBEACON");
-            // this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));  //iBeacon Layout
             console.log("beaconManager created");
         }
         return this.beaconManager;
@@ -188,6 +187,7 @@ export class LocationService extends java.lang.Object {
     }
 
     getRegionFromBeaconRegion(beaconRegion: BeaconRegion): any {
+
         let minor = null;
         if (beaconRegion.minor) {
             minor = org.altbeacon.beacon.Identifier.fromInt(beaconRegion.minor);
@@ -198,10 +198,19 @@ export class LocationService extends java.lang.Object {
             major = org.altbeacon.beacon.Identifier.fromInt(beaconRegion.major);
         }
 
-        return new org.altbeacon.beacon.Region(beaconRegion.identifier, org.altbeacon.beacon.Identifier.fromUuid(java.util.UUID.fromString(beaconRegion.proximityUUID)), major, minor);
+        if (beaconRegion.proximityUUID) {
+            return new org.altbeacon.beacon.Region(beaconRegion.identifier, org.altbeacon.beacon.Identifier.fromUuid(java.util.UUID.fromString(beaconRegion.proximityUUID)), major, minor);
+        }
+
+        return new org.altbeacon.beacon.Region(beaconRegion.identifier, null, major, minor);
+
     }
 
     getBeaconRegionFromRegion(region: any /*org.altbeacon.beacon.Region*/): BeaconRegion {
+        let uuid = null;
+        if (region.getId1()) {
+            uuid = region.getId1().toString();
+        }
         let major = null;
         if (region.getId2()) {
             major = Number(region.getId2().toString())
@@ -210,8 +219,8 @@ export class LocationService extends java.lang.Object {
         if (region.getId3()) {
             minor = Number(region.getId3().toString())
         }
-        let breagion = new BeaconRegion(region.getUniqueId(), region.getId1().toString(), major, minor);
-        return breagion;
+        let bregion = new BeaconRegion(region.getUniqueId(), uuid, major, minor);
+        return bregion;
     }
 
     getBeaconFromNativeBeacon(nativeBeacon: any): Beacon {
