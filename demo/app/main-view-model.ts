@@ -1,6 +1,7 @@
 import {Observable} from 'data/observable';
 import {
     BeaconRegion, Beacon, BeaconCallback,
+    BeaconParserType, RangingOptions,
     BeaconLocationOptions, BeaconLocationOptionsIOSAuthType, BeaconLocationOptionsAndroidAuthType
 } from "nativescript-ibeacon/nativescript-ibeacon.common";
 import {NativescriptIbeacon} from "nativescript-ibeacon";
@@ -11,37 +12,52 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     public message: string = "Init";
 
-    public beaconInRange = {
-        id1: "",
-        id2: "",
-        id3: "",
-        distance: "",
-        updated: ""
-    };
-
-    private closestDistance: number = 99999;
-
     private region: BeaconRegion = null;
+
+    // added default foreground beaconScanInterval
+    private foregroundBeaconScanInterval: number = 1000;
+    // added default background beaconScanInterval
+    private backgroundBeaconScanInterval: number = 3000;
 
     constructor() {
         super();
 
         console.log('Hello World Model constructed');
-        this.resetBeaconInRange();
 
         let options: BeaconLocationOptions = {
             iOSAuthorisationType: BeaconLocationOptionsIOSAuthType.Always,
             androidAuthorisationType: BeaconLocationOptionsAndroidAuthType.Coarse,
-            androidAuthorisationDescription: "Location permission needed"
+            androidAuthorisationDescription: "Location permission needed",
+            parserTypes: []
         };
+
+        let rangingOptions: RangingOptions = {
+            // example of 1 sec foreground scanning interval, null will use default interval
+            // foregroundScanInterval: 1000,
+            foregroundScanInterval: null,
+            // example of 3 sec background scanning interval, null will use default interval
+            // backgroundScanInterval: 3000
+            backgroundScanInterval: null
+        };
+
+        // example of adding specific parser types. An empty array (default) will look for all parserTypes
+        // options.parserTypes.push(BeaconParserType.AltBeacon);
+        // options.parserTypes.push(BeaconParserType.EddystoneTLM);
+        // options.parserTypes.push(BeaconParserType.EddystoneUID);
+        // options.parserTypes.push(BeaconParserType.EddystoneURL);
+        // options.parserTypes.push(BeaconParserType.IBeacon);
         this.nativescriptIbeacon = new NativescriptIbeacon(this, options);
-        // this.region = new BeaconRegion("HelloID", "61687109-905f-4436-91f8-e602f514c96d", null, null);
-        this.region = new BeaconRegion("BeaconIO", null, null, null);
+        
+        // example of ranging for a specific UUID
+        // this.region = new BeaconRegion("HelloID", "61687109-905f-4436-91f8-e602f514c96d", null, null, rangingOptions);
+
+        //example of ranging across all UUIDs
+        this.region = new BeaconRegion("HelloID", null, null, null, rangingOptions);
+
     }
 
     start() {
         this.message = "start";
-        this.resetBeaconInRange();
 
         if (!this.nativescriptIbeacon.isAuthorised()) {
             console.log("NOT Authorised");
@@ -62,7 +78,6 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     stop() {
         this.message = "stop";
-        this.resetBeaconInRange();
         this.nativescriptIbeacon.stopRanging(this.region);
         this.nativescriptIbeacon.stopMonitoring(this.region);
         this.nativescriptIbeacon.unbind();
@@ -79,14 +94,6 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         //this.message = "didRangeBeaconsInRegion: " + (new Date().toDateString());
         for (let beacon of beacons) {
             console.log("B: " + beacon.proximityUUID + " - " + beacon.major + " - " + beacon.minor + " - " + beacon.distance_proximity + " - " + beacon.rssi + " - " + beacon.txPower_accuracy );
-            if (beacon.distance_proximity < this.closestDistance) {
-                this.closestDistance = beacon.distance_proximity;
-                this.beaconInRange.distance = beacon.distance_proximity.toString();
-                this.beaconInRange.id1 = beacon.proximityUUID;
-                this.beaconInRange.id2 = beacon.major.toString();
-                this.beaconInRange.id3 = beacon.minor.toString();
-                this.beaconInRange.updated = (new Date().toDateString());
-            }
         }
     }
 
@@ -101,19 +108,7 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     didExitRegion(region: BeaconRegion) {
         //console.log(region);
-        this.resetBeaconInRange();
         console.log('Did leave Region '  + region.identifier);
     }
-
-    resetBeaconInRange() {
-         this.beaconInRange = {
-            id1: "",
-            id2: "",
-            id3: "",
-            distance: "",
-            updated: ""
-        };
-        this.closestDistance = 99999;
-   }
 
 }

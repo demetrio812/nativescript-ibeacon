@@ -16,11 +16,20 @@ export enum BeaconLocationOptionsIOSAuthType {
 export enum BeaconLocationOptionsAndroidAuthType {
     Coarse, Fine
 }
+export enum BeaconParserType {
+    AltBeacon, EddystoneTLM, EddystoneUID, EddystoneURL, IBeacon
+}
 
 export interface BeaconLocationOptions {
     iOSAuthorisationType: BeaconLocationOptionsIOSAuthType;
     androidAuthorisationType: BeaconLocationOptionsAndroidAuthType;
-    androidAuthorisationDescription: string;
+    androidAuthorisationDescription: string
+    parserTypes: number[];
+}
+
+export interface RangingOptions {
+    foregroundScanInterval: number;
+    backgroundScanInterval: number;
 }
 
 export class Common extends Observable {
@@ -28,7 +37,8 @@ export class Common extends Observable {
     protected options: BeaconLocationOptions = {
         iOSAuthorisationType: BeaconLocationOptionsIOSAuthType.WhenInUse,
         androidAuthorisationType: BeaconLocationOptionsAndroidAuthType.Coarse,
-        androidAuthorisationDescription: "Location permission needed"
+        androidAuthorisationDescription: "Location permission needed",
+        parserTypes: []
     };
 
     constructor(beaconCallback: BeaconCallback, options?: BeaconLocationOptions) {
@@ -73,15 +83,17 @@ export class Common extends Observable {
 
 export class BeaconRegion {
     public identifier: string;
-    public proximityUUID: string;
+    public proximityUUID?: string;
     public major?: number;
     public minor?: number;
+    public rangingOptions?: RangingOptions;
 
-    constructor(identifier: string, proximityUUID: string, major?: number, minor?: number) {
+    constructor(identifier: string, proximityUUID?: string, major?: number, minor?: number, rangingOptions?: RangingOptions) {
         this.identifier = identifier;
-        this.proximityUUID = proximityUUID;
+        if (proximityUUID) this.proximityUUID = proximityUUID;
         if (major) this.major = major;
         if (minor) this.minor = minor;
+        if (rangingOptions) this.rangingOptions = rangingOptions;
     }
 }
 
@@ -101,4 +113,25 @@ export class Beacon {
     }
 }
 
-
+export class BeaconParserTypes {
+    private types: string[];
+    private altBeacon: string = "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25";
+    private eddystoneTLM: string = "x,s:0-1=feaa,m:2-2=20,d:3-3,d:4-5,d:6-7,d:8-11,d:12-15";
+    private eddystoneUID: string = "s:0-1=feaa,m:2-2=00,p:3-3:-41,i:4-13,i:14-19";
+    private eddystoneURL: string = "s:0-1=feaa,m:2-2=10,p:3-3:-41,i:4-20v";
+    private iBeacon: string = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
+    constructor() {
+        this.types = [];
+        this.types[BeaconParserType.AltBeacon] = this.altBeacon;
+        this.types[BeaconParserType.EddystoneTLM] = this.eddystoneTLM;
+        this.types[BeaconParserType.EddystoneUID] = this.eddystoneUID;
+        this.types[BeaconParserType.EddystoneURL] = this.eddystoneURL;
+        this.types[BeaconParserType.IBeacon] = this.iBeacon;
+    }
+    public getTypes(): string[] {
+        return this.types;
+    }
+    public getType(id: number): string {
+        return this.types[id];
+    }
+}
