@@ -14,11 +14,6 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
 
     private region: BeaconRegion = null;
 
-    // added default foreground beaconScanInterval
-    private foregroundBeaconScanInterval: number = 1000;
-    // added default background beaconScanInterval
-    private backgroundBeaconScanInterval: number = 3000;
-
     constructor() {
         super();
 
