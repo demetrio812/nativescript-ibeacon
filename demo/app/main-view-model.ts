@@ -1,6 +1,7 @@
 import {Observable} from 'data/observable';
 import {
     BeaconRegion, Beacon, BeaconCallback,
+    BeaconParserType, RangingOptions,
     BeaconLocationOptions, BeaconLocationOptionsIOSAuthType, BeaconLocationOptionsAndroidAuthType
 } from "nativescript-ibeacon/nativescript-ibeacon.common";
 import {NativescriptIbeacon} from "nativescript-ibeacon";
@@ -17,17 +18,42 @@ export class HelloWorldModel extends Observable implements BeaconCallback {
         super();
 
         console.log('Hello World Model constructed');
+
         let options: BeaconLocationOptions = {
             iOSAuthorisationType: BeaconLocationOptionsIOSAuthType.Always,
             androidAuthorisationType: BeaconLocationOptionsAndroidAuthType.Coarse,
-            androidAuthorisationDescription: "Location permission needed"
+            androidAuthorisationDescription: "Location permission needed",
+            parserTypes: []
         };
+
+        let rangingOptions: RangingOptions = {
+            // example of 1 sec foreground scanning interval, null will use default interval
+            // foregroundScanInterval: 1000,
+            foregroundScanInterval: null,
+            // example of 3 sec background scanning interval, null will use default interval
+            // backgroundScanInterval: 3000
+            backgroundScanInterval: null
+        };
+
+        // example of adding specific parser types. An empty array (default) will look for all parserTypes
+        // options.parserTypes.push(BeaconParserType.AltBeacon);
+        // options.parserTypes.push(BeaconParserType.EddystoneTLM);
+        // options.parserTypes.push(BeaconParserType.EddystoneUID);
+        // options.parserTypes.push(BeaconParserType.EddystoneURL);
+        // options.parserTypes.push(BeaconParserType.IBeacon);
         this.nativescriptIbeacon = new NativescriptIbeacon(this, options);
-        this.region = new BeaconRegion("HelloID", "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6");
+        
+        // example of ranging for a specific UUID
+        // this.region = new BeaconRegion("HelloID", "61687109-905f-4436-91f8-e602f514c96d", null, null, rangingOptions);
+
+        //example of ranging across all UUIDs
+        this.region = new BeaconRegion("HelloID", null, null, null, rangingOptions);
+
     }
 
     start() {
         this.message = "start";
+
         if (!this.nativescriptIbeacon.isAuthorised()) {
             console.log("NOT Authorised");
             this.nativescriptIbeacon.requestAuthorization()

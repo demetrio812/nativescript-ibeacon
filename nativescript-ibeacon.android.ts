@@ -1,6 +1,6 @@
 import {
-    Beacon, BeaconCallback, BeaconLocationOptionsAndroidAuthType, BeaconRegion,
-    Common
+    Beacon, BeaconCallback, BeaconLocationOptions, BeaconLocationOptionsAndroidAuthType, BeaconRegion,
+    Common, BeaconParserTypes
 } from './nativescript-ibeacon.common';
 import * as utils from "utils/utils";
 import {setActivityCallbacks, AndroidActivityCallbacks} from "ui/frame";
@@ -24,11 +24,14 @@ export class LocationService extends java.lang.Object {
     private pendingBeaconRegion: BeaconRegion = null;
     private pendingBeaconMonitor: BeaconRegion = null;
 
-    constructor(context: android.content.Context) {
+    private options: BeaconLocationOptions = null;
+    private beaconParserTypes: BeaconParserTypes = new BeaconParserTypes();
+
+    constructor(context: android.content.Context, options: BeaconLocationOptions) {
         super();
         console.log("constructor");
         this.context = context;
-
+        this.options = options;
         return global.__native(this);
     }
 
@@ -44,7 +47,29 @@ export class LocationService extends java.lang.Object {
     private getBeaconManager() {
         if (this.beaconManager == null) {
             this.beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this.context/*utils.ad.getApplicationContext()*/);
-            this.beaconManager.getBeaconParsers().add(new org.altbeacon.beacon.BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));  //iBeacon Layout
+            this.beaconManager.getBeaconParsers().clear();
+            // no parsers defined? Add all default types
+            if (this.options.parserTypes == null 
+                || this.options.parserTypes == null 
+                || this.options.parserTypes.length < 1) {
+                this.beaconParserTypes.getTypes().forEach(type => {
+                    this.beaconManager.getBeaconParsers().add(
+                        new org.altbeacon.beacon.BeaconParser().
+                        setBeaconLayout(type)
+                        );
+                });
+                console.log(this.beaconParserTypes.getTypes().length + " default parsers added");
+            }
+            // else add all passed parser types
+            else {
+                this.options.parserTypes.forEach(typeId => {
+                    this.beaconManager.getBeaconParsers().add(
+                        new org.altbeacon.beacon.BeaconParser().
+                        setBeaconLayout(this.beaconParserTypes.getType(typeId))
+                        );
+                });
+                console.log(this.options.parserTypes.length + " parsers added");
+            }
             console.log("beaconManager created");
         }
         return this.beaconManager;
@@ -54,6 +79,16 @@ export class LocationService extends java.lang.Object {
         if (this.beaconManagerReady) {
             console.log("startRanging");
             try {
+                if (beaconRegion.rangingOptions.foregroundScanInterval != null 
+                    && beaconRegion.rangingOptions.foregroundScanInterval > 0) {
+                    this.beaconManager.setForegroundBetweenScanPeriod(beaconRegion.rangingOptions.foregroundScanInterval);
+                    console.log("foregroundScanInterval: " + beaconRegion.rangingOptions.foregroundScanInterval);
+                }
+                if (beaconRegion.rangingOptions.backgroundScanInterval != null 
+                    && beaconRegion.rangingOptions.backgroundScanInterval > 0) {
+                    this.beaconManager.setBackgroundBetweenScanPeriod(beaconRegion.rangingOptions.backgroundScanInterval);
+                    console.log("backgroundScanInterval: " + beaconRegion.rangingOptions.backgroundScanInterval);
+                }
                 console.log("startRangingBeaconsInRegion");
                 this.getBeaconManager().startRangingBeaconsInRegion(this.getRegionFromBeaconRegion(beaconRegion)); //
                 //console.log("startRangingBeaconsInRegion2");
@@ -167,6 +202,7 @@ export class LocationService extends java.lang.Object {
     }
 
     getRegionFromBeaconRegion(beaconRegion: BeaconRegion): any {
+
         let minor = null;
         if (beaconRegion.minor) {
             minor = org.altbeacon.beacon.Identifier.fromInt(beaconRegion.minor);
@@ -177,10 +213,20 @@ export class LocationService extends java.lang.Object {
             major = org.altbeacon.beacon.Identifier.fromInt(beaconRegion.major);
         }
 
-        return new org.altbeacon.beacon.Region(beaconRegion.identifier, org.altbeacon.beacon.Identifier.fromUuid(java.util.UUID.fromString(beaconRegion.proximityUUID)), major, minor);
+        if (beaconRegion.proximityUUID) {
+            return new org.altbeacon.beacon.Region(beaconRegion.identifier, org.altbeacon.beacon.Identifier.fromUuid(java.util.UUID.fromString(beaconRegion.proximityUUID)), major, minor);
+        }
+        else {
+            return new org.altbeacon.beacon.Region(beaconRegion.identifier, null, major, minor);
+        }
+
     }
 
     getBeaconRegionFromRegion(region: any /*org.altbeacon.beacon.Region*/): BeaconRegion {
+        let uuid = null;
+        if (region.getId1()) {
+            uuid = region.getId1().toString();
+        }
         let major = null;
         if (region.getId2()) {
             major = Number(region.getId2().toString())
@@ -189,8 +235,8 @@ export class LocationService extends java.lang.Object {
         if (region.getId3()) {
             minor = Number(region.getId3().toString())
         }
-        let breagion = new BeaconRegion(region.getUniqueId(), region.getId1().toString(), major, minor);
-        return breagion;
+        let bregion = new BeaconRegion(region.getUniqueId(), uuid, major, minor);
+        return bregion;
     }
 
     getBeaconFromNativeBeacon(nativeBeacon: any): Beacon {
@@ -219,9 +265,9 @@ export class LocationService extends java.lang.Object {
 export class NativescriptIbeacon extends Common {
     private locationService: LocationService = null;
 
-    constructor(beaconCallback: BeaconCallback) {
+    constructor(beaconCallback: BeaconCallback, options?: BeaconLocationOptions) {
         super(beaconCallback);
-        this.locationService = new LocationService(utils.ad.getApplicationContext());
+        this.locationService = new LocationService(utils.ad.getApplicationContext(), options);
         this.locationService.delegate = beaconCallback;
     }
 

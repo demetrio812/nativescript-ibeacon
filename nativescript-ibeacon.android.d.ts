@@ -1,4 +1,4 @@
-import { Beacon, BeaconCallback, BeaconRegion, Common } from './nativescript-ibeacon.common';
+import { Beacon, BeaconCallback, BeaconLocationOptions, BeaconRegion, Common } from './nativescript-ibeacon.common';
 export declare class LocationService extends java.lang.Object {
     private beaconManager;
     delegate: BeaconCallback;
@@ -8,7 +8,9 @@ export declare class LocationService extends java.lang.Object {
     private monitorNotifierAdded;
     private pendingBeaconRegion;
     private pendingBeaconMonitor;
-    constructor(context: android.content.Context);
+    private options;
+    private beaconParserTypes;
+    constructor(context: android.content.Context, options: BeaconLocationOptions);
     bind(): void;
     unbind(): void;
     private getBeaconManager();
@@ -26,7 +28,7 @@ export declare class LocationService extends java.lang.Object {
 }
 export declare class NativescriptIbeacon extends Common {
     private locationService;
-    constructor(beaconCallback: BeaconCallback);
+    constructor(beaconCallback: BeaconCallback, options?: BeaconLocationOptions);
     requestAuthorization(): Promise<any>;
     isAuthorised(): boolean;
     private getPermission();

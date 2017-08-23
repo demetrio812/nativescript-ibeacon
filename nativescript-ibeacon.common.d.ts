@@ -14,10 +14,22 @@ export declare enum BeaconLocationOptionsAndroidAuthType {
     Coarse = 0,
     Fine = 1,
 }
+export declare enum BeaconParserType {
+    AltBeacon = 0,
+    EddystoneTLM = 1,
+    EddystoneUID = 2,
+    EddystoneURL = 3,
+    IBeacon = 4,
+}
 export interface BeaconLocationOptions {
     iOSAuthorisationType: BeaconLocationOptionsIOSAuthType;
     androidAuthorisationType: BeaconLocationOptionsAndroidAuthType;
     androidAuthorisationDescription: string;
+    parserTypes: number[];
+}
+export interface RangingOptions {
+    foregroundScanInterval: number;
+    backgroundScanInterval: number;
 }
 export declare class Common extends Observable {
     protected options: BeaconLocationOptions;
@@ -33,10 +45,11 @@ export declare class Common extends Observable {
 }
 export declare class BeaconRegion {
     identifier: string;
-    proximityUUID: string;
+    proximityUUID?: string;
     major?: number;
     minor?: number;
-    constructor(identifier: string, proximityUUID: string, major?: number, minor?: number);
+    rangingOptions?: RangingOptions;
+    constructor(identifier: string, proximityUUID?: string, major?: number, minor?: number, rangingOptions?: RangingOptions);
 }
 export declare class Beacon {
     proximityUUID: string;
@@ -46,4 +59,15 @@ export declare class Beacon {
     rssi: number;
     txPower_accuracy: number;
     constructor(proximityUUID: string, major: number, minor: number);
+}
+export declare class BeaconParserTypes {
+    private types;
+    private altBeacon;
+    private eddystoneTLM;
+    private eddystoneUID;
+    private eddystoneURL;
+    private iBeacon;
+    constructor();
+    getTypes(): string[];
+    getType(id: number): string;
 }
