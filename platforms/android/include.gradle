@@ -7,5 +7,5 @@ android {
 }
 
 dependencies {
-	compile 'org.altbeacon:android-beacon-library:2.9.2'
+	implementation 'org.altbeacon:android-beacon-library:2.19.5'
 }
